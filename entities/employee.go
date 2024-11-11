@@ -8,5 +8,5 @@ type Employee struct {
 }
 
 type EmployeeFilter struct {
-	Id int64 `form:"id"`
+	Id int64 `form:"id" json:"id"`
 }

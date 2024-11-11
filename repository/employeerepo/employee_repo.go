@@ -1,10 +1,10 @@
 package employeerepo
 
 import (
-	"clean-arch-employee/entities"
+	"router-template/entities"
 )
 
 type EmployeeRepo interface {
 	GetEmployee() ([]entities.Employee, error)
-	GetEmployeeById(id int) (entities.Employee, error)
+	GetEmployeeById(id int64) (entities.Employee, error)
 }

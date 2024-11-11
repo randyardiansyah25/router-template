@@ -1,14 +1,14 @@
 package usecase
 
 import (
-	"clean-arch-employee/entities"
-	"clean-arch-employee/entities/err"
-	"clean-arch-employee/repository/employeerepo"
+	"router-template/entities"
+	"router-template/entities/app"
+	"router-template/repository/employeerepo"
 )
 
 type EmployeeUsecase interface {
 	GetEmployeeList() ([]entities.Employee, error)
-	GetEmployee(id int) (entities.Employee, error)
+	GetEmployee(id int64) (entities.Employee, error)
 }
 
 func NewEmployeeUsecase() EmployeeUsecase {
@@ -28,13 +28,13 @@ func (e *employeeUsecase) GetEmployeeList() (detail []entities.Employee, er erro
 	// ! DO ANOTHER BUSINESS LOGIC HERE
 
 	if len(detail) == 0 {
-		return detail, err.NoRecord
+		return detail, app.ErrNoRecord
 	}
 
 	return
 }
 
-func (e *employeeUsecase) GetEmployee(id int) (employee entities.Employee, er error) {
+func (e *employeeUsecase) GetEmployee(id int64) (employee entities.Employee, er error) {
 	repo, _ := employeerepo.NewEmployeeRepo()
 	employee, er = repo.GetEmployeeById(id)
 

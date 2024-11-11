@@ -1,15 +1,17 @@
 package employeerepo
 
 import (
-	"clean-arch-employee/entities"
-	"clean-arch-employee/entities/err"
 	"database/sql"
 	"errors"
 	"fmt"
+	"router-template/entities"
+	"router-template/entities/app"
+	"router-template/repository/built_in/databasefactory"
 )
 
-func newEmployeeMysqlImpl(conn *sql.DB) EmployeeRepo {
-	return &employeeMysqlImpl{conn: conn}
+func newEmployeeMysqlImpl() EmployeeRepo {
+	conn := databasefactory.AppDb.GetConnection()
+	return &employeeMysqlImpl{conn: conn.(*sql.DB)}
 }
 
 type employeeMysqlImpl struct {
@@ -36,13 +38,13 @@ func (e *employeeMysqlImpl) GetEmployee() (list []entities.Employee, er error) {
 	}
 
 	if len(list) == 0 {
-		return list, err.NoRecord
+		return list, app.ErrNoRecord
 	} else {
 		return
 	}
 }
 
-func (e *employeeMysqlImpl) GetEmployeeById(id int) (employee entities.Employee, er error) {
+func (e *employeeMysqlImpl) GetEmployeeById(id int64) (employee entities.Employee, er error) {
 	row := e.conn.QueryRow(`SELECT 
 		id,
 		name,

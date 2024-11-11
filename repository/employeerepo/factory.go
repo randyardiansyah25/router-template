@@ -1,17 +1,17 @@
 package employeerepo
 
 import (
-	"clean-arch-employee/repository/databasefactory"
-	"clean-arch-employee/repository/databasefactory/drivers"
-	"database/sql"
 	"errors"
+	"os"
+	"router-template/repository/built_in/databasefactory"
 )
 
 func NewEmployeeRepo() (EmployeeRepo, error) {
-	conn := databasefactory.AppDb.GetConnection()
-	currentDriver := databasefactory.AppDb.GetDriverName()
-	if currentDriver == drivers.MYSQL {
-		return newEmployeeMysqlImpl(conn.(*sql.DB)), nil
+	driverName := os.Getenv("app.database_driver")
+	if driverName == databasefactory.DRIVER_MYSQL {
+		return newEmployeeMysqlImpl(), nil
+	} else if driverName == databasefactory.DRIVER_MOCK {
+		return newEmployeeMockImpl(), nil
 	} else {
 		return nil, errors.New("unimplemented database driver")
 	}

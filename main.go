@@ -1,29 +1,35 @@
 package main
 
 import (
-	"clean-arch-employee/delivery"
-	"clean-arch-employee/delivery/router"
-	"clean-arch-employee/repository/databasefactory"
-	"math/rand"
 	"os"
 	"os/signal"
+	"router-template/delivery"
+	"router-template/delivery/broker"
+	"router-template/delivery/broker/consumer"
+	"router-template/delivery/http/router"
+	"router-template/repository/built_in/databasefactory"
 	"runtime"
 	"syscall"
 	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kpango/glg"
+	"github.com/randyardiansyah25/libpkg/util/env"
 )
 
 func main() {
-	go delivery.PrintoutObserver()
+	go delivery.StartPrintoutObserver()
+	isUse := env.GetBool("rabbit.use", false)
+	if isUse {
+		broker.ConnectToRabbit()
+		go consumer.Start()
+		go broker.BrokerClosedChannelObserver()
+	}
 	router.Start()
 }
 
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	rand.Seed(time.Now().UTC().UnixNano())
-
 	LoadConfiguration(false)
 	if os.Getenv("app.database_driver") != "" {
 		PrepareDatabase()
@@ -34,6 +40,11 @@ func init() {
 
 func LoadConfiguration(isReload bool) {
 	var er error
+
+	if loc, er := time.LoadLocation("Asia/Jakarta"); er != nil {
+		glg.Get().SetTimeLocation(loc)
+	}
+	glg.Get().SetTimeLocation(&time.Location{})
 	if isReload {
 		_ = glg.Log("Reloading configuration file...")
 		er = godotenv.Overload(".env")
@@ -57,7 +68,9 @@ func LoadConfiguration(isReload bool) {
 			SetMode(glg.BOTH).
 			AddLevelWriter(glg.LOG, log).
 			AddLevelWriter(glg.DEBG, log).
-			AddLevelWriter(glg.INFO, log)
+			AddLevelWriter(glg.INFO, log).
+			AddLevelWriter(glg.ERR, log).
+			AddLevelWriter(glg.WARN, log)
 	}
 
 	//Untuk error akan selalu dicatat dalam file
