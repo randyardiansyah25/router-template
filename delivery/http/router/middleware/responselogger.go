@@ -37,15 +37,25 @@ func ResponseLogger(ctx *gin.Context) {
 
 	ctx.Writer = w
 
-	//** Go to next handler
-	ctx.Next()
-
-	//** Ini setelah handler sebelumnya sudah memberikan response
+	// Prepare dulu untuk kebutuhan response
 	var bufferInfo strings.Builder
 	bufferInfo.WriteString(fmt.Sprintf("[RESPONSE] %s, Path: %s, Response Info: \n", ctx.Request.Method, ctx.Request.URL.String()))
 	bufferInfo.WriteString(fmt.Sprintf("Status Code: %d\n", w.Status()))
 
-	//** Write Headers
+	// Cek dulu jika handler sebelumnya sudah memberikan response ke client
+	if w.Status() != 200 {
+		// ** Jika ada custom middleware, wajib memanggil middleware.ResponseString() atau middlware.ResponseJSON() untuk meresponse gagal ke client
+		// ** response yang di set, akan di isi ke context dengan key status_message, dan ditangkap disini untuk di simpan ke writer sebagai body response
+		w.body.WriteString(ctx.GetString("status_message"))
+		// Abort disini supaya berhenti di handlernya middleware, tidak dilanjut ke handler endpoint
+		ctx.Abort()
+	}
+
+	// Go to next handler
+	ctx.Next()
+	// Disini setelah handler sebelumnya sudah memberikan response
+
+	// Write Headers
 	for name, values := range ctx.Writer.Header() {
 		for _, value := range values {
 			bufferInfo.WriteString(fmt.Sprintf("%s: %s\n", name, value))
