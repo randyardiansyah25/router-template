@@ -41,10 +41,10 @@ func init() {
 func LoadConfiguration(isReload bool) {
 	var er error
 
-	if loc, er := time.LoadLocation("Asia/Jakarta"); er != nil {
+	if loc, er := time.LoadLocation("Asia/Jakarta"); er == nil {
 		glg.Get().SetTimeLocation(loc)
 	}
-	glg.Get().SetTimeLocation(&time.Location{})
+
 	if isReload {
 		_ = glg.Log("Reloading configuration file...")
 		er = godotenv.Overload(".env")
