@@ -10,17 +10,38 @@
 Description= Router Template
 After=network.target
 
+# Untuk memastikan agar service dijalankan (misal) setelah mysql dan service running saat server start up
+#After=network.target mysql.service redis.service 
+
+# Prioritas dependensi, jika salah satu service gagal dijalankan, maka service ini pun tidak akan dijalanan
+#Requires=mysql.service redis.service
+
 [Service]
 Type=simple
 User=root
 Group=root
 WorkingDirectory=/path/to/service/directory
+
+# Alternatif untuk memastikan dependensi terhadap service lain yang menggunakan port listener
+# Sample : Mengeksekusi perintah untuk memastikan bahwa MySQL (port 3306) dan Redis (port 6379) sudah siap sebelum memulai layanan.
+#ExecStartPre=/bin/sh -c 'until nc -z localhost 3306; do sleep 1; done'
+#ExecStartPre=/bin/sh -c 'until nc -z localhost 6379; do sleep 1; done'
+
 ExecStart=/path/to/service/directory/service_bin_file
 ExecReload=/bin/kill -HUP $MAINPID
+
 #StandardOutput=file:/home/to/app/path/log/service.log
 #StandardError=file:/home/to/app/path/log/service.err
+
 Restart=on-failure
+# Memberikan delay saat restart
+#RestartSec=5
+
+#Environment="ENV_VAR1=value1" "ENV_VAR2=value2"
+
 
 [Install]
 WantedBy=multi-user.target
+# Penamaan service menggunakan alias
+#Alias=router-alias.service
 
