@@ -1,8 +1,6 @@
 package keyvaluefactory
 
 import (
-	"errors"
-
 	"github.com/randyardiansyah25/libpkg/util/env"
 )
 
@@ -11,6 +9,6 @@ func GetStore() (Store, error) {
 	if driverName == DRIVER_REDIS {
 		return newRedisImpl(), nil
 	} else {
-		return nil, errors.New("unimplemented keyvalue store driver")
+		return newStoreMockImpl(), nil
 	}
 }

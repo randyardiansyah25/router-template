@@ -1,0 +1,26 @@
+# 1. ln -s /path/to/service/directory/<service_name>.service /etc/systemd/system/
+# 2. sudo systemctl daemon-reload
+# 3. sudo systemctl enable <service name>
+# 4. sudo systemctl start <service name>
+# Jika StandardOutput dan StandardError tidak diisi, maka output standard dari service akan diarahkan
+# ke log journalctl (log sistem default linux yang mendukung systemd). 
+# Untuk melihat dalam journalctl :# journalctl -u <service name>.service
+
+[Unit]
+Description= Router Template
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/path/to/service/directory
+ExecStart=/path/to/service/directory/service_bin_file
+ExecReload=/bin/kill -HUP $MAINPID
+#StandardOutput=file:/home/to/app/path/log/service.log
+#StandardError=file:/home/to/app/path/log/service.err
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

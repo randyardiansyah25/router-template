@@ -12,6 +12,7 @@ require (
 require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-faker/faker/v4 v4.5.0
+	github.com/jasonlvhit/gocron v0.0.1
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/redis/go-redis/v9 v9.7.0
 )
